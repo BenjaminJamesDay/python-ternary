@@ -71,6 +71,34 @@ def plot(points, ax=None, permutation=None, **kwargs):
     ax.plot(xs, ys, **kwargs)
     return ax
 
+def arrow(points, ax=None, permutation=None, arrows=1, **kwargs):
+    """
+    Analogous to maplotlib.arrow. Plots trajectory points where each point is a
+    tuple (x,y,z) satisfying x + y + z = scale (not checked). The tuples are
+    projected and plotted as a curve.
+
+    Parameters
+    ----------
+    points: List of 3-tuples
+        The list of tuples to be plotted as a connected curve.
+    ax: Matplotlib AxesSubplot, None
+        The subplot to draw on.
+    kwargs:
+        Any kwargs to pass through to matplotlib.
+    """
+    if not ax:
+        fig, ax = pyplot.subplots()
+    xs, ys = project_sequence(points, permutation=permutation)
+    # plots an arrow at the 1/(arrows+1) intervals excluding 0 and 1
+    # so arrows = 1 puts 1 arrow halfway, 2 puts an arrow at 1/3 and 2/3
+    interval = int(np.floor(len(xs)/(arrows+1)))
+    for i in range(arrows):
+        # plot an arrow from x_i,y_i to x_i+1,y_i+1
+        x,y = xs[(i+1)*interval],ys[(i+1)*interval]
+        dx,dy = xs[(i+1)*interval+1]-x, ys[(i+1)*interval+1]-y
+        ax.arrow(x,y,dx,dy, **kwargs)
+    return ax
+
 
 def plot_colored_trajectory(points, cmap=None, ax=None, permutation=None,
                             **kwargs):

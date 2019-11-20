@@ -419,6 +419,12 @@ class TernaryAxesSubplot(object):
         plotting.plot(points, ax=ax, permutation=permutation,
                       **kwargs)
 
+    def arrow(self, points, arrows=1, **kwargs):
+        ax = self.get_axes()
+        permutation = self._permutation
+        plotting.arrow(points, ax=ax, arrows=arrows, permutation=permutation,
+                       **kwargs)
+
     def plot_colored_trajectory(self, points, cmap=None, **kwargs):
         ax = self.get_axes()
         permutation = self._permutation
