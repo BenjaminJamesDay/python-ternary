@@ -5,6 +5,7 @@ Plotting functions: scatter, plot (curves), axis labelling.
 import matplotlib
 from matplotlib import pyplot
 import numpy as np
+import math
 
 from .helpers import project_sequence
 from .colormapping import get_cmap, colorbar_hack
@@ -99,8 +100,7 @@ def arrow(points, ax=None, permutation=None, arrows=1, **kwargs):
         ax.arrow(x,y,dx,dy, **kwargs)
     return ax
 
-
-def plot_colored_trajectory(points, cmap=None, ax=None, permutation=None,
+def plot_colored_trajectory(points, ax=None, permutation=None,
                             **kwargs):
     """
     Plots trajectories with changing color, simlar to `plot`. Trajectory points
@@ -120,10 +120,8 @@ def plot_colored_trajectory(points, cmap=None, ax=None, permutation=None,
     """
     if not ax:
         fig, ax = pyplot.subplots()
-    cmap = get_cmap(cmap)
     xs, ys = project_sequence(points, permutation=permutation)
 
-    # We want to color each segment independently...which is annoying.
     segments = []
     for i in range(len(xs) - 1):
         cur_line = []
@@ -136,13 +134,12 @@ def plot_colored_trajectory(points, cmap=None, ax=None, permutation=None,
         cur_line.append([x_after, y_after])
         segments.append(cur_line)
     segments = np.array(segments)
-
-    line_segments = matplotlib.collections.LineCollection(segments, cmap=cmap, **kwargs)
+                       
+    line_segments = matplotlib.collections.LineCollection(segments, **kwargs)
     line_segments.set_array(np.arange(len(segments)))
     ax.add_collection(line_segments)
 
     return ax
-
 
 def scatter(points, ax=None, permutation=None, colorbar=False, colormap=None,
             vmin=0, vmax=1, scientific=False, cbarlabel=None, cb_kwargs=None,

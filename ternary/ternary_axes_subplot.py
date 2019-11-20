@@ -425,10 +425,10 @@ class TernaryAxesSubplot(object):
         plotting.arrow(points, ax=ax, arrows=arrows, permutation=permutation,
                        **kwargs)
 
-    def plot_colored_trajectory(self, points, cmap=None, **kwargs):
+    def plot_colored_trajectory(self, points, **kwargs):
         ax = self.get_axes()
         permutation = self._permutation
-        plotting.plot_colored_trajectory(points, cmap=cmap, ax=ax,
+        plotting.plot_colored_trajectory(points, ax=ax,
                                          permutation=permutation, **kwargs)
 
     def heatmap(self, data, scale=None, cmap=None, scientific=False,
