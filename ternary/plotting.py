@@ -72,7 +72,7 @@ def plot(points, ax=None, permutation=None, **kwargs):
     ax.plot(xs, ys, **kwargs)
     return ax
 
-def arrow(points, ax=None, permutation=None, arrows=1, **kwargs):
+def arrow(points, ax=None, permutation=None, arrows=1, start=False, end=False, **kwargs):
     """
     Analogous to maplotlib.arrow. Plots trajectory points where each point is a
     tuple (x,y,z) satisfying x + y + z = scale (not checked). The tuples are
@@ -93,6 +93,17 @@ def arrow(points, ax=None, permutation=None, arrows=1, **kwargs):
     # plots an arrow at the 1/(arrows+1) intervals excluding 0 and 1
     # so arrows = 1 puts 1 arrow halfway, 2 puts an arrow at 1/3 and 2/3
     interval = int(np.floor(len(xs)/(arrows+1)))
+    # if start then plot an arrow on the first segment
+    if start:
+        x,y = xs[0], ys[0]
+        dx,dy = xs[1]-x, ys[1]-y
+        ax.arrow(x,y,dx,dy, **kwargs)
+    # if endthen plot an arrow on the last segment
+    if end:
+        x,y = xs[-1], ys[-1]
+        dx,dy = xs[-1]-xs[-2], ys[-1]-ys[-2]
+        ax.arrow(x,y,dx,dy, **kwargs)
+    
     for i in range(arrows):
         # plot an arrow from x_i,y_i to x_i+1,y_i+1
         x,y = xs[(i+1)*interval],ys[(i+1)*interval]
