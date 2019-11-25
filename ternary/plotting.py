@@ -111,6 +111,70 @@ def arrow(points, ax=None, permutation=None, arrows=1, start=False, end=False, *
         ax.arrow(x,y,dx,dy, **kwargs)
     return ax
 
+def color_point(x, y, z, scale):
+    w = 255
+    x_color = x * w / float(scale)
+    y_color = y * w / float(scale)
+    z_color = z * w / float(scale)
+    r = math.fabs(w - y_color) / w
+    g = math.fabs(w - x_color) / w
+    b = math.fabs(w - z_color) / w
+    return (r, g, b, 1.)
+
+def color_segment(segment, scale):
+    x = 0.5*(segment[0][0] + segment[1][0])
+    y = 0.5*(segment[0][1] + segment[1][1])
+    z = 1 - x - y
+    return color_point(x,y,z,scale)
+    
+def new_colored_trajectory(points, ax=None, permutation=None,
+                            **kwargs):
+    """
+    Plots trajectories with changing color, simlar to `plot`. Trajectory points
+    are tuples (x,y,z) satisfying x + y + z = scale (not checked). The tuples are
+    projected and plotted as a curve.
+
+    Parameters
+    ----------
+    points: List of 3-tuples
+        The list of tuples to be plotted as a connected curve.
+    ax: Matplotlib AxesSubplot, None
+        The subplot to draw on.
+    cmap: String or matplotlib.colors.Colormap, None
+        The name of the Matplotlib colormap to use.
+    kwargs:
+        Any kwargs to pass through to matplotlib.
+    """
+    if not ax:
+        fig, ax = pyplot.subplots()
+    xs, ys = project_sequence(points, permutation=permutation)
+
+    segments = []
+    seg_colours = []
+    for i in range(len(xs) - 1):
+        cur_line = []
+        x_before = xs[i]
+        y_before = ys[i]
+        x_after = xs[i+1]
+        y_after = ys[i+1]
+
+        cur_line.append([x_before, y_before])
+        cur_line.append([x_after, y_after])
+        segments.append(cur_line)
+        
+        x_mid = 0.5 * (x_before + x_after)
+        y_mid = 0.5 * (y_before + y_after)
+        z_mid = 1 - x_mid - y_mid
+        seg_colours.append(color_point(x_mid, y_mid, z_mid, 1.0))
+        
+    segments = np.array(segments)
+    line_segments = matplotlib.collections.LineCollection(segments,colors=seg_colours, cmap=None,
+                                                          **kwargs)
+    #line_segments.set_array(np.arange(len(segments)))
+    ax.add_collection(line_segments)
+
+    return ax
+
 def plot_colored_trajectory(points, ax=None, permutation=None,
                             **kwargs):
     """
