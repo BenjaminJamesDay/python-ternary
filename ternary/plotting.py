@@ -97,18 +97,24 @@ def arrow(points, ax=None, permutation=None, arrows=1, start=False, end=False, *
     if start:
         x,y = xs[0], ys[0]
         dx,dy = xs[1]-x, ys[1]-y
-        ax.arrow(x,y,dx,dy, **kwargs)
-    # if endthen plot an arrow on the last segment
+        # have to get colour from real points (not projected)
+        cx,cy,cz = points[0]
+        ax.arrow(x,y,dx,dy,color=color_point(cx,cy,cz,1.), **kwargs)
+    # if end then plot an arrow on the last segment
     if end:
         x,y = xs[-1], ys[-1]
         dx,dy = xs[-1]-xs[-2], ys[-1]-ys[-2]
-        ax.arrow(x,y,dx,dy, **kwargs)
+        # have to get colour from real points (not projected)
+        cx,cy,cz = points[-1]
+        ax.arrow(x,y,dx,dy,color=color_point(cx,cy,cz,1.), **kwargs)
     
     for i in range(arrows):
         # plot an arrow from x_i,y_i to x_i+1,y_i+1
         x,y = xs[(i+1)*interval],ys[(i+1)*interval]
         dx,dy = xs[(i+1)*interval+1]-x, ys[(i+1)*interval+1]-y
-        ax.arrow(x,y,dx,dy, **kwargs)
+        # have to get colour from real points (not projected)
+        cx,cy,cz = points[(i+1)*interval]
+        ax.arrow(x,y,dx,dy,color=color_point(cx,cy,cz,1.), **kwargs)
     return ax
 
 def color_point(x, y, z, scale):
@@ -124,7 +130,7 @@ def color_point(x, y, z, scale):
 def color_segment(segment, scale):
     x = 0.5*(segment[0][0] + segment[1][0])
     y = 0.5*(segment[0][1] + segment[1][1])
-    z = 1 - x - y
+    z = 1. - x - y
     return color_point(x,y,z,scale)
     
 def new_colored_trajectory(points, ax=None, permutation=None,
@@ -155,17 +161,17 @@ def new_colored_trajectory(points, ax=None, permutation=None,
         cur_line = []
         x_before = xs[i]
         y_before = ys[i]
-        x_after = xs[i+1]
-        y_after = ys[i+1]
+        x_after = 1.05*xs[i+1]-0.05*xs[i]
+        y_after = 1.05*ys[i+1]-0.05*ys[i]
+        
 
         cur_line.append([x_before, y_before])
         cur_line.append([x_after, y_after])
         segments.append(cur_line)
         
-        x_mid = 0.5 * (x_before + x_after)
-        y_mid = 0.5 * (y_before + y_after)
-        z_mid = 1 - x_mid - y_mid
-        seg_colours.append(color_point(x_mid, y_mid, z_mid, 1.0))
+        x,y,z = points[i]
+        
+        seg_colours.append(color_point(x, y, z, 1.0))
         
     segments = np.array(segments)
     line_segments = matplotlib.collections.LineCollection(segments,colors=seg_colours, cmap=None,
